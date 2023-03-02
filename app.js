@@ -29,7 +29,7 @@ initializeDBAndServer();
 //API 1
 app.get("/states/", async (request, response) => {
   const getStatesQuery = `
-    SELECT * FROM state`;
+    SELECT state_id AS  stateId,state_name AS  stateName,population  FROM state`;
   const statesArray = await db.all(getStatesQuery);
   response.send(statesArray);
 });
@@ -37,7 +37,7 @@ app.get("/states/", async (request, response) => {
 //API 2
 app.get("/states/:stateId/", async (request, response) => {
   const { stateId } = request.params;
-  const getStateQuery = ` SELECT * FROM state WHERE state_id = ${stateId};`;
+  const getStateQuery = ` SELECT state_id AS  stateId,state_name AS  stateName,population FROM state WHERE state_id = ${stateId};`;
   const state = await db.get(getStateQuery);
   response.send(state);
 });
@@ -72,7 +72,10 @@ app.post("/districts/", async (request, response) => {
 //API 4
 app.get("/districts/:districtId/", async (request, response) => {
   const { districtId } = request.params;
-  const getDistrictQuery = ` SELECT * FROM district WHERE district_id = ${districtId};`;
+  const getDistrictQuery = ` SELECT district_id AS districtId,
+  district_name AS  districtName,
+  state_id AS stateId,
+  cases,cured,active,deaths FROM district WHERE district_id = ${districtId};`;
   const district = await db.get(getDistrictQuery);
   response.send(district);
 });

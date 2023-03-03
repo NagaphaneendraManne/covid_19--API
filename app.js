@@ -29,9 +29,18 @@ initializeDBAndServer();
 //API 1
 app.get("/states/", async (request, response) => {
   const getStatesQuery = `
-    SELECT state_id AS  stateId,state_name AS  stateName,population  FROM state`;
+    SELECT *  FROM state`;
   const statesArray = await db.all(getStatesQuery);
-  response.send(statesArray);
+  const convertDbObjectToResponseObject = (dbObject) => {
+    return {
+      stateId: dbObject.state_id,
+      stateName: dbObject.state_name,
+      population: dbObject.population,
+    };
+  };
+  response.send(
+    statesArray.map((eachState) => convertDbObjectToResponseObject(eachState))
+  );
 });
 
 //API 2
@@ -55,7 +64,7 @@ app.post("/districts/", async (request, response) => {
   } = districtDetails;
   const addDistrictQuery = `
     INSERT INTO
-      districts (district_name,
+      district (district_name,
    state_id,
     cases,cured,active,deaths)
     VALUES(
@@ -64,8 +73,8 @@ app.post("/districts/", async (request, response) => {
          ${cases},
          ${cured},
          ${active},
-         ${deaths};`;
-  const district = await db.run(addDistrictQuery);
+         ${deaths});`;
+  await db.run(addDistrictQuery);
   response.send("District Successfully Added");
 });
 
@@ -108,16 +117,16 @@ app.put("/districts/:districtId/", async (request, response) => {
     UPDATE
       district
     SET
-      district_name=${districtName},
-      state_id = ${stateId},
-      cases = ${cases},
-       cured = ${cured},
-        active = ${active},
-      deaths = ${deaths}
+      district_name='${districtName}',
+      state_id = '${stateId}',
+      cases = '${cases}',
+       cured = '${cured}',
+        active = '${active}',
+      deaths = '${deaths}'
       WHERE
       district_id = ${districtId};`;
   await db.run(updateDistrictQuery);
-  response.send("district Details Updated");
+  response.send("District Details Updated");
 });
 
 //API 7
